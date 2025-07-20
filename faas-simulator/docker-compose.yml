@@ -1,0 +1,18 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./functions:/functions         # ✅ mount functions to container
+      - ./handler:/handler             # ✅ needed if calling handler inside API
+    working_dir: /app
+    command: ["python", "server.py"]
+
+  handler:
+    build: ./handler
+    volumes:
+      - ./functions:/functions         # ✅ mount function files
+    working_dir: /handler
+    command: ["sleep", "infinity"]     # idle unless explicitly called
