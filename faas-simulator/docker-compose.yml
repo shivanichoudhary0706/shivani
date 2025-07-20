@@ -1,4 +1,6 @@
-version: '3'
+# docker-compose.yml
+version: '3.8' # Use a slightly newer version for potentially more features
+
 services:
   api:
     build: ./api
@@ -6,13 +8,34 @@ services:
       - "8000:8000"
     volumes:
       - ./functions:/functions         # ✅ mount functions to container
-      - ./handler:/handler             # ✅ needed if calling handler inside API
+      - ./handler:/handler             # ✅ needed if calling handler inside API for logging
     working_dir: /app
-    command: ["python", "server.py"]
+    # Use uvicorn to run the FastAPI app
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      API_KEY: "your_super_secret_api_key" # Set API Key as environment variable
+    # Optional: Resource limits for the API service
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5' # Limit to half a CPU core
+          memory: 256M # Limit to 256MB of RAM
+        reservations:
+          cpus: '0.25' # Reserve a quarter of a CPU core
+          memory: 128M # Reserve 128MB of RAM
 
   handler:
     build: ./handler
     volumes:
       - ./functions:/functions         # ✅ mount function files
     working_dir: /handler
-    command: ["sleep", "infinity"]     # idle unless explicitly called
+    command: ["sleep", "infinity"]     # idle unless explicitly called (e.g., if you had a separate worker pulling from a queue)
+    # Optional: Resource limits for the Handler service (more relevant if it's doing heavy work)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M

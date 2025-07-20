@@ -1,4 +1,3 @@
 # functions/hello.py
-def handler(params):
-    name = params.get("name", "World")
+def hello(name: str):
     return f"Hello, {name}!"

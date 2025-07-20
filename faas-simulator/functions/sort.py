@@ -1,7 +1,6 @@
 # functions/sort.py
-def handler(params):
-    import random
-    size = params.get("size", 10000)
-    data = [random.randint(0, 10000) for _ in range(size)]
+import random
+def sort(data: list):
     sorted_data = sorted(data)
-    return "Sorting completed"
+    # Return a subset as the full list might be too large for logs
+    return {"first_five": sorted_data[:5], "last_five": sorted_data[-5:]}
